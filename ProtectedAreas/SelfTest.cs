@@ -447,6 +447,65 @@ namespace ProtectedAreas
             area.OwnerOnline = true;
         }
 
+        /// <summary>Explosoes a ate 10 blocos de uma area so valem se o dono do objeto for autorizado nela.</summary>
+        private static void ExplosionTests(Human human, Area area, Structure built)
+        {
+            ulong id = Guard.IdOf(human);
+            string me = human.DisplayName;
+            try
+            {
+                DynamicThing tool = human.LeftHandSlot.Occupant;
+                float buffer = Plugin.ExplosionBufferBlocks.Value * ProtectionPatches.BlockSize;
+                Vector3 edge = area.Center + new Vector3(area.Radius, 0f, 0f);
+                Plugin.Log.LogInfo($"SELFTEST explosao: objeto={(tool ? tool.name : "nenhum")} dono={(tool ? tool.OwnerClientId : 0UL)} faixa={buffer:0}m");
+                if (tool)
+                {
+                    Check("explosao: quem carrega vira dono do objeto", tool.OwnerClientId == id);
+                    Check("explosao: objeto de autorizado e permitido", ProtectionPatches.ExplosionBlockedBy(area.Center, tool, out _) == null);
+                }
+                Check("explosao: origem desconhecida e anulada dentro da area", ProtectionPatches.ExplosionBlockedBy(area.Center, null, out _) == area);
+
+                Commands.Execute(human, new[] { "del", me });
+                if (tool)
+                {
+                    Check("explosao: objeto de nao autorizado e anulado na area", ProtectionPatches.ExplosionBlockedBy(area.Center, tool, out _) == area);
+                    Check("explosao: anulado a menos de 10 blocos da borda", ProtectionPatches.ExplosionBlockedBy(edge + new Vector3(buffer - 2f, 0f, 0f), tool, out _) == area);
+                    Check("explosao: permitido alem de 10 blocos da borda", ProtectionPatches.ExplosionBlockedBy(edge + new Vector3(buffer + 2f, 0f, 0f), tool, out _) == null);
+                }
+
+                if (built)
+                {
+                    // Explosao de verdade ao lado de uma estrutura, com o dono da area online (dano normal ligado).
+                    area.OwnerOnline = true;
+                    float before = built.DamageState.Total;
+                    int denied = Guard.DeniedCount;
+                    ProtectionPatches.ExplosionSource = tool;
+                    Explosion.Explode(20f, built.Position, 4f);
+                    Check("explosao: de nao autorizado nao causa dano", built && built.DamageState.Total == before && Guard.DeniedCount > denied,
+                        $"{before} -> {(built ? built.DamageState.Total : -1f)}");
+
+                    Commands.Execute(human, new[] { "add", me });
+                    Explosion.Explode(20f, built.Position, 4f);
+                    Check("explosao: de autorizado causa dano", built && built.DamageState.Total > before,
+                        $"{before} -> {(built ? built.DamageState.Total : -1f)}");
+                    if (built)
+                    {
+                        built.DamageState.HealAll();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Check("explosao: sem excecao", false, ex.ToString());
+            }
+            ProtectionPatches.ExplosionSource = null;
+            area.OwnerOnline = true;
+            if (!area.IsMember(id))
+            {
+                Commands.Execute(human, new[] { "add", me });
+            }
+        }
+
         /// <summary>Expulsao: o dono tira da area um jogador nao autorizado (aqui, ele mesmo).</summary>
         private static void KickTests(Human human, Area area)
         {
@@ -641,6 +700,7 @@ namespace ProtectedAreas
             }
 
             ProtectionTests(human, area, built);
+            ExplosionTests(human, area, built);
             NetworkTests(human, area, built, multiKit, cellC, cellD);
 
             // --- persistencia

@@ -127,6 +127,27 @@ namespace ProtectedAreas
             return false;
         }
 
+        /// <summary>
+        /// Primeira area a ate <paramref name="buffer"/> metros da posicao em que esse id nao e autorizado.
+        /// </summary>
+        public static Area FirstNear(UnityEngine.Vector3 position, float buffer, ulong id)
+        {
+            Area[] areas = _published;
+            for (int i = 0; i < areas.Length; i++)
+            {
+                Area area = areas[i];
+                float reach = area.Radius + buffer;
+                if (Math.Abs(position.x - area.X) <= reach
+                    && Math.Abs(position.y - area.Y) <= reach
+                    && Math.Abs(position.z - area.Z) <= reach
+                    && !(id != 0UL && area.IsMember(id)))
+                {
+                    return area;
+                }
+            }
+            return null;
+        }
+
         public static bool IsDamageProtected(Area area)
         {
             switch (Plugin.DamageProtection.Value)

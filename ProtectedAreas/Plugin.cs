@@ -26,7 +26,7 @@ namespace ProtectedAreas
     {
         public const string PluginGuid = "mooka.stationeers.protectedareas";
         public const string PluginName = "ProtectedAreas";
-        public const string PluginVersion = "1.3.0";
+        public const string PluginVersion = "1.4.0";
 
         public static ManualLogSource Log;
 
@@ -38,6 +38,7 @@ namespace ProtectedAreas
         public static ConfigEntry<DamageProtectionMode> DamageProtection;
         public static ConfigEntry<bool> ProtectInteractions;
         public static ConfigEntry<float> TrespassKickSeconds;
+        public static ConfigEntry<float> ExplosionBufferBlocks;
         public static ConfigEntry<bool> AdminsBypass;
         public static ConfigEntry<string> AdminSteamIds;
 
@@ -76,6 +77,8 @@ namespace ProtectedAreas
                 "When structures inside an area are immune to damage (explosions, fire, pressure): OwnerOffline, Always or Never.");
             ProtectInteractions = Config.Bind("Rules", "ProtectInteractions", true,
                 "If true, unauthorized players cannot use doors, levers, valves, switches, slots or containers inside an area.");
+            ExplosionBufferBlocks = Config.Bind("Rules", "ExplosionBufferBlocks", 10f,
+                "Explosions (grenades, explosives, canisters, furnaces...) do nothing inside an area or within this many blocks of it (1 block = 2 m), unless the exploding object belongs to a player authorized in that area. -1 = off.");
             TrespassKickSeconds = Config.Bind("Rules", "TrespassKickSeconds", 30f,
                 "Seconds an unauthorized player may stay inside someone else's area after being warned. When time is up they are moved out (if they have the mod) or disconnected from the server. 0 = off.");
             AdminsBypass = Config.Bind("Admins", "AdminsBypass", true,

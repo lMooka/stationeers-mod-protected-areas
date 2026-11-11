@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("decomp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3968ec8a52f71793f15a542b4eba39588c7ced1f")]
 [assembly: System.Reflection.AssemblyProductAttribute("decomp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("decomp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

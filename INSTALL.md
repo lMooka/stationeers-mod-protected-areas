@@ -84,6 +84,8 @@ What you should know as a player:
 - If you walk into someone else's area you get a warning and **30 seconds to leave**. If you stay you
   are moved out (with the mod) or disconnected from the server (without it).
 - While an area's owner is offline, the structures inside it cannot be damaged.
+- Explosives, grenades and canisters do nothing inside an area or within 10 blocks of it, unless they
+  belong to a player authorized in that area.
 
 ## 5. Server settings (host only)
 
@@ -101,6 +103,7 @@ After the first run the host can edit:
 | `SpawnProtectionDistance` | 100 | Minimum distance from the world spawn. 0 = off. |
 | `DamageProtection` | OwnerOffline | When structures are immune to damage: `OwnerOffline`, `Always` or `Never`. |
 | `ProtectInteractions` | true | Block doors, levers, valves, switches, slots and containers for unauthorized players. |
+| `ExplosionBufferBlocks` | 10 | Explosions do nothing inside an area or within this many blocks of it (1 block = 2 m), unless the object's owner is authorized there. -1 = off. |
 | `TrespassKickSeconds` | 30 | Time an intruder may stay before being removed. 0 = off. |
 | `AdminsBypass` | true | Admins ignore every restriction except overlapping areas. |
 | `AdminSteamIds` | (empty) | Extra admins, as comma-separated SteamID64 values. The host is always an admin. |

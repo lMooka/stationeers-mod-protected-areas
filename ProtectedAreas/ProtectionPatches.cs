@@ -41,6 +41,7 @@ namespace ProtectedAreas
             Patches.PatchSingle(harmony, AccessTools.Method(typeof(Explosion), "Explode"), nameof(ExplodePrefix), self);
 
             Plugin.Log.LogInfo($"Protection patches applied: PreventInteraction x{prevent}, Damage x{damage}");
+            ApplyExplosionSources(harmony);
         }
 
         // ---------------------------------------------------------------- interacoes
@@ -253,19 +254,255 @@ namespace ProtectedAreas
             }
         }
 
-        /// <summary>Explosao encostando em uma area imune: ainda fere jogadores, mas nao escava o terreno.</summary>
-        private static void ExplodePrefix(Vector3 __1, float __2, ref bool __4)
+        // ---------------------------------------------------------------- explosoes
+
+        /// <summary>
+        /// O objeto que esta explodindo agora (granada, explosivo, canister, fornalha...). Explosion.Explode nao
+        /// recebe quem explodiu, entao os metodos que a chamam sao interceptados para preencher este campo.
+        /// </summary>
+        internal static Thing ExplosionSource;
+
+        private static readonly System.Collections.Generic.Dictionary<Type, System.Reflection.FieldInfo> ThisFields =
+            new System.Collections.Generic.Dictionary<Type, System.Reflection.FieldInfo>();
+
+        /// <summary>Metodos assincronos do jogo que terminam em explosao: (classe, metodo).</summary>
+        private static readonly string[][] AsyncSources =
         {
+            new[] { "Grenade", "GrenadeOperation" },
+            new[] { "Dynamite", "DynamiteOperation" },
+            new[] { "ItemExplosive", "ExplosionCountdown" },
+            new[] { "DeviceInputOutputImportCircuit", "HaltAndCatchFire" },
+            new[] { "DeviceInputOutputCircuit", "HaltAndCatchFire" },
+            new[] { "DeviceInputOutputImportExportCircuit", "HaltAndCatchFire" },
+            new[] { "CircuitHousing", "HaltAndCatchFire" },
+            new[] { "RobotMining", "HaltAndCatchFire" },
+            new[] { "SurvivalToolbelt", "HaltAndCatchFire" },
+            new[] { "AdvancedTablet", "HaltAndCatchFire" },
+            new[] { "Laptop", "HaltAndCatchFire" },
+            new[] { "AdvancedSuit", "HaltAndCatchFire" },
+            new[] { "SuitBase", "HaltAndCatchFire" },
+        };
+
+        /// <summary>Metodos comuns do jogo que chamam Explosion.Explode: (classe, metodo).</summary>
+        private static readonly string[][] DirectSources =
+        {
+            new[] { "GasCanister", "OnDamageDestroyed" },
+            new[] { "DynamicGasCanister", "OnDamageDestroyed" },
+            new[] { "ItemExplosive", "OnDestroy" },
+            new[] { "FurnaceBase", "Explode" },
+            new[] { "StirlingEngine", "Explode" },
+        };
+
+        private const System.Reflection.BindingFlags DeclaredAny =
+            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public
+            | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.DeclaredOnly;
+
+        internal static void ApplyExplosionSources(Harmony harmony)
+        {
+            Type self = typeof(ProtectionPatches);
+            HarmonyMethod finalizer = new HarmonyMethod(self.GetMethod(nameof(SourceFinalizer), Static));
+            HarmonyMethod direct = new HarmonyMethod(self.GetMethod(nameof(DirectSourcePrefix), Static));
+            HarmonyMethod machine = new HarmonyMethod(self.GetMethod(nameof(StateMachineSourcePrefix), Static));
+            int patched = 0;
+            int expected = AsyncSources.Length + DirectSources.Length;
+
+            foreach (Type type in AccessTools.GetTypesFromAssembly(typeof(Thing).Assembly))
+            {
+                if (type == null || type.IsNested)
+                {
+                    continue;
+                }
+                foreach (string[] source in DirectSources)
+                {
+                    if (type.Name != source[0])
+                    {
+                        continue;
+                    }
+                    try
+                    {
+                        System.Reflection.MethodInfo method = type.GetMethod(source[1], DeclaredAny);
+                        if (method != null)
+                        {
+                            harmony.Patch(method, prefix: direct, finalizer: finalizer);
+                            patched++;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Plugin.Log.LogWarning($"Could not track explosions of {type.Name}.{source[1]}: {ex.Message}");
+                    }
+                }
+                foreach (string[] source in AsyncSources)
+                {
+                    if (type.Name != source[0])
+                    {
+                        continue;
+                    }
+                    foreach (Type nested in type.GetNestedTypes(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic))
+                    {
+                        if (!nested.Name.StartsWith("<" + source[1] + ">d__", StringComparison.Ordinal))
+                        {
+                            continue;
+                        }
+                        try
+                        {
+                            System.Reflection.MethodInfo moveNext = nested.GetMethod("MoveNext", DeclaredAny);
+                            System.Reflection.FieldInfo thisField = nested.GetField("<>4__this", DeclaredAny);
+                            if (moveNext != null && thisField != null)
+                            {
+                                ThisFields[nested] = thisField;
+                                // Maquinas de estado "struct" precisam receber a instancia por referencia.
+                                HarmonyMethod prefix = nested.IsValueType
+                                    ? new HarmonyMethod(self.GetMethod(nameof(StructMachineSourcePrefix), Static).MakeGenericMethod(nested))
+                                    : machine;
+                                harmony.Patch(moveNext, prefix: prefix, finalizer: finalizer);
+                                patched++;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Plugin.Log.LogWarning($"Could not track explosions of {type.Name}.{source[1]}: {ex.Message}");
+                        }
+                    }
+                }
+            }
+            Patches.PatchSingle(harmony, AccessTools.Method(typeof(Thing), "OnChildEnterInventory"), nameof(TrackOwnerPrefix), self);
+            Plugin.Log.LogInfo($"Explosion sources tracked: {patched} of {expected}");
+        }
+
+        private static void DirectSourcePrefix(object __instance, out Thing __state)
+        {
+            __state = ExplosionSource;
+            ExplosionSource = __instance as Thing;
+        }
+
+        private static void StateMachineSourcePrefix(object __instance, out Thing __state)
+        {
+            __state = ExplosionSource;
             try
             {
-                if (__4 && GameManager.RunSimulation && AreaStore.AnyDamageProtectedIntersecting(__1, __2))
+                if (__instance != null && ThisFields.TryGetValue(__instance.GetType(), out System.Reflection.FieldInfo field))
                 {
-                    __4 = false;
+                    ExplosionSource = field.GetValue(__instance) as Thing;
                 }
             }
             catch (Exception ex)
             {
                 Patches.LogOnce(ex);
+            }
+        }
+
+        private static void StructMachineSourcePrefix<T>(ref T __instance, out Thing __state) where T : struct
+        {
+            __state = ExplosionSource;
+            try
+            {
+                if (ThisFields.TryGetValue(typeof(T), out System.Reflection.FieldInfo field))
+                {
+                    ExplosionSource = field.GetValue(__instance) as Thing;
+                }
+            }
+            catch (Exception ex)
+            {
+                Patches.LogOnce(ex);
+            }
+        }
+
+        private static void SourceFinalizer(Thing __state)
+        {
+            ExplosionSource = __state;
+        }
+
+        /// <summary>
+        /// Registra em cada objeto quem o carregou por ultimo (fica salvo junto com o mundo).
+        /// E esse "dono" que decide se uma explosao perto de uma area e permitida.
+        /// </summary>
+        private static void TrackOwnerPrefix(Thing __instance, DynamicThing __0)
+        {
+            try
+            {
+                if (!GameManager.RunSimulation || (object)__0 == null || __0 is Entity)
+                {
+                    return;
+                }
+                ulong id = Guard.IdOf(HumanOf(__instance));
+                if (id >= Guard.MinSteamId && __0.OwnerClientId != id)
+                {
+                    __0.OwnerClientId = id;
+                }
+            }
+            catch (Exception ex)
+            {
+                Patches.LogOnce(ex);
+            }
+        }
+
+        /// <summary>Dono do objeto que explode: quem construiu (estruturas) ou quem carregou por ultimo (objetos).</summary>
+        internal static ulong OwnerOf(Thing source)
+        {
+            if ((object)source == null)
+            {
+                return 0UL;
+            }
+            ulong owner = source.OwnerClientId;
+            if (owner >= Guard.MinSteamId)
+            {
+                return owner;
+            }
+            return Guard.IdOf(HumanOf(source)); // ainda na mao/mochila de alguem
+        }
+
+        /// <summary>
+        /// Area que anula uma explosao nessa posicao: qualquer area a ate N blocos de distancia
+        /// em que o dono do objeto nao e autorizado. Retorna null se a explosao pode acontecer.
+        /// </summary>
+        internal static Area ExplosionBlockedBy(Vector3 position, Thing source, out ulong owner)
+        {
+            owner = OwnerOf(source);
+            float blocks = Plugin.ExplosionBufferBlocks.Value;
+            if (blocks < 0f)
+            {
+                return null;
+            }
+            float buffer = blocks * BlockSize;
+            ulong ownerId = owner;
+            bool admin = Plugin.AdminsBypass.Value && Guard.IsAdminId(ownerId);
+            if (admin)
+            {
+                return null;
+            }
+            return AreaStore.FirstNear(position, buffer, ownerId);
+        }
+
+        /// <summary>Um bloco = uma celula do grid grande de construcao (2 m).</summary>
+        public const float BlockSize = 2f;
+
+        private static bool ExplodePrefix(Vector3 __1, float __2, ref bool __4)
+        {
+            try
+            {
+                if (!GameManager.RunSimulation)
+                {
+                    return true;
+                }
+                Area blocking = ExplosionBlockedBy(__1, ExplosionSource, out ulong owner);
+                if (blocking != null)
+                {
+                    Guard.NotifyDenied(Human.Find(owner), blocking,
+                        $"Explosives have no effect within {Plugin.ExplosionBufferBlocks.Value:0} blocks of protected area '{blocking.Name}'.");
+                    return false; // sem dano, sem escavar terreno
+                }
+                // Explosao permitida encostando em uma area imune (dono offline): nao escava o terreno.
+                if (__4 && AreaStore.AnyDamageProtectedIntersecting(__1, __2))
+                {
+                    __4 = false;
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Patches.LogOnce(ex);
+                return true;
             }
         }
     }

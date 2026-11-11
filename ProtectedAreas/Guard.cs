@@ -83,6 +83,10 @@ namespace ProtectedAreas
             {
                 return false;
             }
+            if (!GameManager.IsBatchMode && IdOf(Human.LocalHuman) == id)
+            {
+                return true; // o host
+            }
             string source = Plugin.AdminSteamIds.Value ?? string.Empty;
             lock (AdminIds)
             {
@@ -256,6 +260,11 @@ namespace ProtectedAreas
         /// <summary>Avisa o jogador que a acao foi bloqueada (no maximo um aviso a cada 3 segundos por jogador).</summary>
         public static void NotifyDenied(Human human, Area area)
         {
+            NotifyDenied(human, area, null);
+        }
+
+        public static void NotifyDenied(Human human, Area area, string text)
+        {
             DeniedCount++;
             if ((object)human == null)
             {
@@ -271,7 +280,7 @@ namespace ProtectedAreas
                 }
                 LastNotice[id] = now;
             }
-            Tell(human, DeniedText(area));
+            Tell(human, text ?? DeniedText(area));
         }
 
         /// <summary>Envia uma mensagem para um jogador: console local para o host, chat para clientes.</summary>

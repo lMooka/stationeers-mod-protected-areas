@@ -21,6 +21,14 @@ For anyone who is **not** authorized, inside the area:
 (grenades, explosions, fire, pressure) and explosions do not dig the terrain next to the area. While the
 owner is online, damage works normally.
 
+**Explosions:** grenades, explosives, dynamite, gas canisters, furnaces and any other explosion do
+**nothing** — no damage to structures, objects or players, no terrain digging — inside an area or within
+**10 blocks** (20 m) of it. Exception: if the exploding object belongs to a player who is authorized in
+that area, the explosion works normally. An object "belongs" to whoever carried it last (structures: to
+whoever built them); this is saved with the world. Objects nobody has carried since the mod was installed
+have no owner and are treated as unauthorized. Change the distance with `ExplosionBufferBlocks`
+(`-1` = off).
+
 **Trespassing:** anyone who enters another player's area gets a warning and has **30 seconds** to leave
 (reminders at 20, 10 and 5 s). If they stay they are removed: moved outside if they have the mod, or
 **disconnected from the server** if they do not. Leaving the area or being authorized cancels the
@@ -137,6 +145,7 @@ that counts). Options from the old `[Areas]` section (version 1.x) are no longer
 | Rules | `SpawnProtectionDistance` | 100 | Minimum distance from the world spawn points (0 = off). |
 | Rules | `DamageProtection` | OwnerOffline | When structures are immune: `OwnerOffline`, `Always` or `Never`. |
 | Rules | `ProtectInteractions` | true | Blocks devices, slots and containers for unauthorized players. |
+| Rules | `ExplosionBufferBlocks` | 10 | Explosions do nothing inside an area or within this many blocks (1 block = 2 m) of it, unless the object's owner is authorized there. -1 = off. |
 | Rules | `TrespassKickSeconds` | 30 | Time an unauthorized player may stay in an area before being removed (0 = off). |
 | Admins | `AdminsBypass` | true | Admins ignore the restrictions (except overlap). |
 | Admins | `AdminSteamIds` | (empty) | SteamID64 of extra admins, comma-separated. The host is always an admin. |
@@ -160,7 +169,7 @@ second player.
 |---|---|
 | `ProtectedAreas/Plugin.cs` | BepInEx entry point, configuration and boundary drawing. |
 | `ProtectedAreas/Patches.cs` | Patches for building, tools, terrain and chat. |
-| `ProtectedAreas/ProtectionPatches.cs` | Patches for interactions, containers, damage and explosions. |
+| `ProtectedAreas/ProtectionPatches.cs` | Patches for interactions, containers, damage, explosions and object ownership. |
 | `ProtectedAreas/Guard.cs` | Permission rules, admins and player notices. |
 | `ProtectedAreas/Commands.cs` | Chat and console commands, creation rules and `kick`. |
 | `ProtectedAreas/Trespass.cs` | Trespass warning with countdown and removal. |

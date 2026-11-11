@@ -15,3 +15,4 @@ G:\stationeers_scripts\mod\tools\decomp\obj\Release\net10.0\refint\decomp.dll
 G:\stationeers_scripts\mod\tools\decomp\obj\Release\net10.0\decomp.pdb
 G:\stationeers_scripts\mod\tools\decomp\obj\Release\net10.0\decomp.genruntimeconfig.cache
 G:\stationeers_scripts\mod\tools\decomp\obj\Release\net10.0\ref\decomp.dll
+G:\stationeers_scripts\mod\tools\decomp\obj\Release\net10.0\decomp.sourcelink.json
