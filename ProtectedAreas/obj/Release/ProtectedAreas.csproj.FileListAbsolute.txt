@@ -1,0 +1,7 @@
+G:\stationeers_scripts\mod\ProtectedAreas\bin\Release\ProtectedAreas.dll
+G:\stationeers_scripts\mod\ProtectedAreas\obj\Release\ProtectedAreas.csproj.AssemblyReference.cache
+G:\stationeers_scripts\mod\ProtectedAreas\obj\Release\ProtectedAreas.GeneratedMSBuildEditorConfig.editorconfig
+G:\stationeers_scripts\mod\ProtectedAreas\obj\Release\ProtectedAreas.AssemblyInfoInputs.cache
+G:\stationeers_scripts\mod\ProtectedAreas\obj\Release\ProtectedAreas.AssemblyInfo.cs
+G:\stationeers_scripts\mod\ProtectedAreas\obj\Release\ProtectedAreas.csproj.CoreCompileInputs.cache
+G:\stationeers_scripts\mod\ProtectedAreas\obj\Release\ProtectedAreas.dll

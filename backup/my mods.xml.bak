@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModProfile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Name="My Mods" Description="">
+  <Mod Name="Inventory Tweaks" Source="Workshop" DirectoryPath="G:\SteamLibrary\steamapps\workshop\content\544550\3573053238" WorkshopHandle="3573053238" ModID="" />
+  <Mod Name="Shortcuts Recovered[BepinexMods]" Source="Workshop" DirectoryPath="G:\SteamLibrary\steamapps\workshop\content\544550\3263500577" WorkshopHandle="3263500577" ModID="" />
+</ModProfile>

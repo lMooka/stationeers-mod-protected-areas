@@ -1,0 +1,17 @@
+G:\stationeers_scripts\mod\tools\decomp\out\decomp.exe
+G:\stationeers_scripts\mod\tools\decomp\out\decomp.deps.json
+G:\stationeers_scripts\mod\tools\decomp\out\decomp.runtimeconfig.json
+G:\stationeers_scripts\mod\tools\decomp\out\decomp.dll
+G:\stationeers_scripts\mod\tools\decomp\out\decomp.pdb
+G:\stationeers_scripts\mod\tools\decomp\out\ICSharpCode.Decompiler.dll
+G:\stationeers_scripts\mod\tools\decomp\obj\Release\net10.0\decomp.csproj.AssemblyReference.cache
+G:\stationeers_scripts\mod\tools\decomp\obj\Release\net10.0\decomp.GeneratedMSBuildEditorConfig.editorconfig
+G:\stationeers_scripts\mod\tools\decomp\obj\Release\net10.0\decomp.AssemblyInfoInputs.cache
+G:\stationeers_scripts\mod\tools\decomp\obj\Release\net10.0\decomp.AssemblyInfo.cs
+G:\stationeers_scripts\mod\tools\decomp\obj\Release\net10.0\decomp.csproj.CoreCompileInputs.cache
+G:\stationeers_scripts\mod\tools\decomp\obj\Release\net10.0\decomp.csproj.Up2Date
+G:\stationeers_scripts\mod\tools\decomp\obj\Release\net10.0\decomp.dll
+G:\stationeers_scripts\mod\tools\decomp\obj\Release\net10.0\refint\decomp.dll
+G:\stationeers_scripts\mod\tools\decomp\obj\Release\net10.0\decomp.pdb
+G:\stationeers_scripts\mod\tools\decomp\obj\Release\net10.0\decomp.genruntimeconfig.cache
+G:\stationeers_scripts\mod\tools\decomp\obj\Release\net10.0\ref\decomp.dll

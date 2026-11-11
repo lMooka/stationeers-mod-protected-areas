@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModConfig xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Core Enabled="true">
+    <Path />
+  </Core>
+  <Workshop Enabled="true">
+    <Path Value="G:\SteamLibrary\steamapps\workshop\content\544550\3573053238" />
+    <WorkshopId Value="3573053238" />
+  </Workshop>
+  <Workshop Enabled="true">
+    <Path Value="G:\SteamLibrary\steamapps\workshop\content\544550\3263500577" />
+    <WorkshopId Value="3263500577" />
+  </Workshop>
+  <Workshop Enabled="false">
+    <Path Value="G:\SteamLibrary\steamapps\workshop\content\544550\3462118387" />
+    <WorkshopId Value="3462118387" />
+  </Workshop>
+  <Workshop Enabled="false">
+    <Path Value="G:\SteamLibrary\steamapps\workshop\content\544550\1969204820" />
+    <WorkshopId Value="1969204820" />
+  </Workshop>
+  <Workshop Enabled="false">
+    <Path Value="G:\SteamLibrary\steamapps\workshop\content\544550\3022917356" />
+    <WorkshopId Value="3022917356" />
+  </Workshop>
+  <Local Enabled="false">
+    <Path Value="C:\Users\Mooka\Documents\My Games\Stationeers\mods\ProtectedAreas" />
+  </Local>
+  <Workshop Enabled="false">
+    <Path Value="G:\SteamLibrary\steamapps\workshop\content\544550\1909694362" />
+    <WorkshopId Value="1909694362" />
+  </Workshop>
+</ModConfig>

@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "TuZ/taWLaCU=",
+  "success": true,
+  "projectFilePath": "G:\\stationeers_scripts\\mod\\tools\\decomp\\decomp.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Mooka\\.nuget\\packages\\icsharpcode.decompiler\\11.1.0.9782\\icsharpcode.decompiler.11.1.0.9782.nupkg.sha512"
+  ],
+  "logs": []
+}
